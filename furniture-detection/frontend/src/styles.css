@@ -1,0 +1,23 @@
+/* src/styles.css */
+/* 全局样式重置 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* 基础字体设置 */
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f0f2f5;
+  }
+  
+  /* Material-UI 组件覆盖 */
+  .MuiToggleButtonGroup-root {
+    margin: 16px 0;
+  }
+  
+  .MuiCard-root {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
