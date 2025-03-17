@@ -1,0 +1,112 @@
+# ==================== 通用忽略 ====================
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
+
+# ==================== 前端 (React) ====================
+# 依赖目录
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+
+# 构建输出
+frontend/build/
+frontend/dist/
+frontend/out/
+
+# 缓存文件
+frontend/.cache/
+frontend/.next/
+
+# 环境文件
+frontend/.env*
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# 调试文件
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# IDE文件
+frontend/.vscode/
+frontend/.idea/
+
+# ==================== 后端 (Python/Flask) ====================
+# 虚拟环境
+backend/venv/
+backend/.venv/
+backend/env/
+backend/ENV/
+
+# Python编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 模型文件 & 大文件
+*.weights
+*.pt
+*.pth
+*.h5
+*.onnx
+data/  # 如果有数据集目录
+
+# 配置文件
+backend/.env
+backend/.flaskenv
+backend/instance/
+
+# 数据库文件
+*.db
+*.sqlite
+
+# 日志文件
+*.log
+logs/
+
+# ==================== 深度学习相关 ====================
+# 训练检查点
+checkpoints/
+runs/  # Ultralytics默认训练输出目录
+
+# 数据集缓存
+.cache/
+.keras/
+
+# ==================== 编辑器/IDE ====================
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# ==================== 系统文件 ====================
+# Windows
+Desktop.ini
+[Tt]humbs.db
+
+# macOS
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+.directory
+*~
