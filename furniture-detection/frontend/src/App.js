@@ -48,9 +48,10 @@ const App = () => {
     setSelectedFile(file);
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('options', JSON.stringify(selectedOptions));
 
     try {
-      const response = await axios.post('http://localhost:5000/api/detect', formData);
+      const response = await axios.post('/api/detect', formData);
       setResults(response.data.detections);
     } catch (error) {
       console.error('检测失败:', error);
@@ -76,11 +77,11 @@ const App = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Box sx={{ display: 'flex', height: '80vh', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, height: '80vh', gap: 3 }}>
         {/* 左侧：上传 & 选项 */}
-        <Box sx={{ width: '30%', p: 2, bgcolor: 'white', borderRadius: 2, boxShadow: 3 }}>
+        <Box sx={{ width: { xs: '100%', md: '30%' }, p: 2, bgcolor: 'white', borderRadius: 2, boxShadow: 3 }}>
           <Typography variant="h6" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
-            请选择类型
+            家具识别系统
           </Typography>
           <Box sx={{ textAlign: 'center', mb: 2 }}>
             <ToggleButtonGroup
@@ -112,12 +113,6 @@ const App = () => {
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>支持格式: JPG, PNG, MP4</Typography>
             </Box>
           )}
-
-          <Stack spacing={1} sx={{ mb: 2 }}>
-            {options.map((option) => (
-              <FormControlLabel key={option} control={<Checkbox checked={selectedOptions.includes(option)} onChange={() => handleOptionToggle(option)} color="primary" />} label={option} />
-            ))}
-          </Stack>
         </Box>
 
         {/* 右侧：识别结果 */}
