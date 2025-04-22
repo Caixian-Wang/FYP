@@ -51,8 +51,12 @@ const App = () => {
     formData.append('options', JSON.stringify(selectedOptions));
 
     try {
-      const response = await axios.post('/api/detect', formData);
-      setResults(response.data.detections);
+      const response = await axios.post('http://localhost:8000/api/v1/detect/image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setResults(response.data);
     } catch (error) {
       console.error('检测失败:', error);
       alert('检测失败，请检查文件格式或网络连接');

@@ -3,6 +3,7 @@ from typing import List
 from app.models.base import DetectionResult, TaskStatus
 from app.utils.file_processor import save_upload_file, cleanup_file
 from app.tasks.celery_tasks import async_video_detection
+from app.models.detector import detector
 
 router = APIRouter()
 
@@ -10,8 +11,10 @@ router = APIRouter()
 async def detect_image(file: UploadFile = File(...)):
     try:
         file_path = await save_upload_file(file)
-        # 实际检测逻辑
-        return [DetectionResult(class_name="chair", confidence=0.95, bbox=[10,20,100,200])]
+        detections = detector.detect(file_path)
+        return detections
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cleanup_file(file_path)
 
@@ -22,4 +25,4 @@ async def detect_video(file: UploadFile = File(...)):
         task = async_video_detection.delay(video_path)
         return TaskStatus(task_id=task.id, status="PENDING")
     except Exception as e:
-        raise HTTPException(500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
