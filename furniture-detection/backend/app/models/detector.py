@@ -1,7 +1,10 @@
 from ultralytics import YOLO
 import os
-from typing import List
+from typing import List, Tuple
+import cv2
+import numpy as np
 from app.models.base import DetectionResult
+import base64
 
 class FurnitureDetector:
     def __init__(self):
@@ -19,9 +22,39 @@ class FurnitureDetector:
         except Exception as e:
             print(f"Error loading model: {e}")
             raise
+    
+    def draw_detections(self, image: np.ndarray, detections: List[DetectionResult]) -> np.ndarray:
+        """在图像上绘制检测结果"""
+        img = image.copy()
+        for det in detections:
+            # 获取边界框坐标
+            x1, y1, x2, y2 = map(int, det.bbox)
+            
+            # 绘制边界框
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            
+            # 准备标签文本
+            label = f"{det.class_name} {det.confidence:.2f}"
+            
+            # 计算标签位置
+            label_size, baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            y1 = max(y1, label_size[1])
+            
+            # 绘制标签背景
+            cv2.rectangle(img, (x1, y1 - label_size[1]), (x1 + label_size[0], y1), (0, 255, 0), cv2.FILLED)
+            
+            # 绘制标签文本
+            cv2.putText(img, label, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
         
-    def detect(self, image_path: str) -> List[DetectionResult]:
+        return img
+        
+    def detect(self, image_path: str) -> Tuple[List[DetectionResult], str]:
         try:
+            # 读取原始图像
+            original_image = cv2.imread(image_path)
+            if original_image is None:
+                raise ValueError("Failed to read image")
+            
             # 运行检测
             results = self.model(image_path)
             detections = []
@@ -47,7 +80,15 @@ class FurnitureDetector:
                         bbox=bbox
                     ))
             
-            return detections
+            # 在图像上绘制检测结果
+            annotated_image = self.draw_detections(original_image, detections)
+            
+            # 将图像转换为base64字符串
+            _, buffer = cv2.imencode('.jpg', annotated_image)
+            image_base64 = base64.b64encode(buffer).decode('utf-8')
+            
+            return detections, f"data:image/jpeg;base64,{image_base64}"
+            
         except Exception as e:
             print(f"Error during detection: {e}")
             raise

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from typing import List
+from typing import List, Dict, Any
 from app.models.base import DetectionResult, TaskStatus
 from app.utils.file_processor import save_upload_file, cleanup_file
 from app.tasks.celery_tasks import async_video_detection
@@ -7,8 +7,8 @@ from app.models.detector import detector
 
 router = APIRouter()
 
-@router.post("/detect/image", response_model=List[DetectionResult])
-async def detect_image(file: UploadFile = File(...)):
+@router.post("/detect/image")
+async def detect_image(file: UploadFile = File(...)) -> Dict[str, Any]:
     file_path = None
     try:
         # 验证文件类型
@@ -19,9 +19,12 @@ async def detect_image(file: UploadFile = File(...)):
         file_path = await save_upload_file(file)
         
         # 运行检测
-        detections = detector.detect(file_path)
+        detections, annotated_image = detector.detect(file_path)
         
-        return detections
+        return {
+            "detections": detections,
+            "annotated_image": annotated_image
+        }
     except HTTPException:
         raise
     except Exception as e:

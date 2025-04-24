@@ -38,6 +38,7 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('upload'); // 'upload' 或 'camera'
   const [language, setLanguage] = useState('zh');
+  const [error, setError] = useState(null);
   const t = language === 'zh' ? zh : en;
 
   const options = ['Option1', 'Option2', 'Option3', 'Option4', 'Option5', 'Option6'];
@@ -92,6 +93,36 @@ const App = () => {
     } catch (error) {
       console.error('检测失败:', error);
       alert('检测失败，请检查文件格式或网络连接');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (file) => {
+    setLoading(true);
+    setError(null);
+    setResults([]);
+    setPreviewUrl(URL.createObjectURL(file));
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('http://localhost:8000/api/v1/detect/image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Detection failed');
+      }
+
+      const data = await response.json();
+      setResults(data.detections);
+      setPreviewUrl(data.annotated_image);
+    } catch (err) {
+      setError('Failed to process image');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -259,6 +290,31 @@ const App = () => {
             </Typography>
           </>
         )}
+      </Box>
+    );
+  };
+
+  const renderResults = (results) => {
+    if (!results || results.length === 0) {
+      return <Typography>暂无识别结果</Typography>;
+    }
+
+    return (
+      <Box>
+        <Typography variant="h6" gutterBottom>识别结果</Typography>
+        {results.map((result, index) => (
+          <Card key={index} sx={{ mb: 2, p: 2 }}>
+            <Typography variant="subtitle1" color="primary">
+              家具类型: {result.class_name}
+            </Typography>
+            <Typography>
+              置信度: {(result.confidence * 100).toFixed(1)}%
+            </Typography>
+            <Typography>
+              位置: [{result.bbox.map(coord => coord.toFixed(1)).join(', ')}]
+            </Typography>
+          </Card>
+        ))}
       </Box>
     );
   };
@@ -437,75 +493,7 @@ const App = () => {
                   />
                 </Box>
               ) : results.length > 0 ? (
-                <Stack spacing={2}>
-                  {results.map((item, index) => (
-                    <Card
-                      key={index}
-                      sx={{
-                        borderRadius: 3,
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-                        transition: 'transform 0.2s, box-shadow 0.2s',
-                        border: '1px solid rgba(25, 118, 210, 0.1)',
-                        overflow: 'hidden',
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
-                        }
-                      }}
-                    >
-                      <CardContent sx={{ p: 3 }}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 'bold',
-                            background: 'linear-gradient(45deg, #1976d2, #2196f3)',
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            mb: 1
-                          }}
-                        >
-                          {item.class}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            mb: 1,
-                            color: 'text.secondary',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1
-                          }}
-                        >
-                          {t.confidence}: 
-                          <Box
-                            sx={{
-                              px: 2,
-                              py: 0.5,
-                              borderRadius: 2,
-                              backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                              color: '#1976d2',
-                              fontWeight: 'bold'
-                            }}
-                          >
-                            {(item.confidence * 100).toFixed(1)}%
-                          </Box>
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: 'text.secondary',
-                            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                            p: 1,
-                            borderRadius: 1,
-                            fontFamily: 'monospace'
-                          }}
-                        >
-                          {t.coordinates}: {item.bbox.map(num => num.toFixed(1)).join(', ')}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Stack>
+                renderResults(results)
               ) : (
                 <Box
                   sx={{
