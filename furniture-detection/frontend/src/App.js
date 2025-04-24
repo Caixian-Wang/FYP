@@ -509,17 +509,31 @@ const App = () => {
               ) : (
                 <Box
                   sx={{
-                    py: 8,
+                    py: 12,
+                    px: 6,
                     textAlign: 'center',
                     backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                    borderRadius: 2,
-                    border: '1px dashed rgba(0, 0, 0, 0.1)'
+                    borderRadius: 3,
+                    border: '1px dashed rgba(0, 0, 0, 0.1)',
+                    minHeight: '200px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+                    }
                   }}
                 >
                   <Typography
                     color="text.secondary"
                     sx={{
-                      fontStyle: 'italic'
+                      fontStyle: 'italic',
+                      fontSize: '1.2rem',
+                      color: 'text.secondary',
+                      opacity: 0.7
                     }}
                   >
                     {t.noResults}
