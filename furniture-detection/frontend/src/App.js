@@ -14,13 +14,17 @@ import {
   LinearProgress,
   Container,
   Paper,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CloseIcon from '@mui/icons-material/Close';
+import LanguageIcon from '@mui/icons-material/Language';
 import axios from 'axios';
+import { zh } from './locales/zh';
+import { en } from './locales/en';
 
 const App = () => {
   const webcamRef = useRef(null);
@@ -33,6 +37,8 @@ const App = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('upload'); // 'upload' 或 'camera'
+  const [language, setLanguage] = useState('zh');
+  const t = language === 'zh' ? zh : en;
 
   const options = ['Option1', 'Option2', 'Option3', 'Option4', 'Option5', 'Option6'];
 
@@ -106,6 +112,10 @@ const App = () => {
     setResults([]);
   };
 
+  const handleLanguageChange = () => {
+    setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
+  };
+
   const renderPreviewArea = () => {
     if (mediaType === 'video') {
       return (
@@ -131,7 +141,7 @@ const App = () => {
               boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
             }}
           >
-            捕获并检测
+            {t.captureAndDetect}
           </Button>
         </Box>
       );
@@ -176,7 +186,7 @@ const App = () => {
             {mediaType === 'picture' ? (
               <img
                 src={previewUrl}
-                alt="预览"
+                alt={t.preview}
                 style={{
                   maxWidth: '100%',
                   maxHeight: '300px',
@@ -236,7 +246,7 @@ const App = () => {
                 WebkitTextFillColor: 'transparent'
               }}
             >
-              点击上传{mediaType === 'picture' ? '图片' : '视频'}
+              {t.uploadImage}
             </Typography>
             <Typography 
               variant="body2" 
@@ -245,7 +255,7 @@ const App = () => {
                 textShadow: '0 1px 2px rgba(0,0,0,0.05)'
               }}
             >
-              支持格式: {mediaType === 'picture' ? 'JPG, PNG' : 'MP4'}
+              {t.supportedFormats}: {mediaType === 'picture' ? t.imageFormats : t.videoFormats}
             </Typography>
           </>
         )}
@@ -279,9 +289,27 @@ const App = () => {
             maxHeight: '95vh',
             overflowY: 'auto',
             border: '1px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            position: 'relative'
           }}
         >
+          <Tooltip title={language === 'zh' ? 'Switch to English' : '切换到中文'}>
+            <IconButton
+              onClick={handleLanguageChange}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.2)'
+                }
+              }}
+            >
+              <LanguageIcon sx={{ color: '#1976d2' }} />
+            </IconButton>
+          </Tooltip>
+
           <Typography
             variant="h3"
             gutterBottom
@@ -297,7 +325,7 @@ const App = () => {
               textShadow: '2px 2px 4px rgba(0,0,0,0.08)'
             }}
           >
-            家具识别系统
+            {t.title}
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, height: 'calc(85vh - 120px)' }}>
@@ -355,8 +383,8 @@ const App = () => {
                     }
                   }}
                 >
-                  <ToggleButton value="picture">图片识别</ToggleButton>
-                  <ToggleButton value="video">视频识别</ToggleButton>
+                  <ToggleButton value="picture">{t.pictureRecognition}</ToggleButton>
+                  <ToggleButton value="video">{t.videoRecognition}</ToggleButton>
                 </ToggleButtonGroup>
               </Box>
 
@@ -393,7 +421,7 @@ const App = () => {
                   mb: 3
                 }}
               >
-                识别结果
+                {t.recognitionResults}
               </Typography>
               {loading ? (
                 <Box sx={{ width: '100%', mt: 2 }}>
@@ -448,7 +476,7 @@ const App = () => {
                             gap: 1
                           }}
                         >
-                          置信度: 
+                          {t.confidence}: 
                           <Box
                             sx={{
                               px: 2,
@@ -472,7 +500,7 @@ const App = () => {
                             fontFamily: 'monospace'
                           }}
                         >
-                          坐标: {item.bbox.map(num => num.toFixed(1)).join(', ')}
+                          {t.coordinates}: {item.bbox.map(num => num.toFixed(1)).join(', ')}
                         </Typography>
                       </CardContent>
                     </Card>
@@ -494,7 +522,7 @@ const App = () => {
                       fontStyle: 'italic'
                     }}
                   >
-                    暂无结果
+                    {t.noResults}
                   </Typography>
                 </Box>
               )}
