@@ -73,28 +73,7 @@ const App = () => {
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
-      handleFileUpload(file);
-    }
-  };
-
-  const handleFileUpload = async (file) => {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('options', JSON.stringify(selectedOptions));
-
-    try {
-      const response = await axios.post('http://localhost:8000/api/v1/detect/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setResults(response.data);
-    } catch (error) {
-      console.error('检测失败:', error);
-      alert('检测失败，请检查文件格式或网络连接');
-    } finally {
-      setLoading(false);
+      handleImageUpload(file);
     }
   };
 
@@ -118,11 +97,12 @@ const App = () => {
       }
 
       const data = await response.json();
-      setResults(data.detections);
+      console.log('Detection response:', data);
+      setResults(data.detections || []);
       setPreviewUrl(data.annotated_image);
     } catch (err) {
       setError('Failed to process image');
-      console.error(err);
+      console.error('Upload error:', err);
     } finally {
       setLoading(false);
     }
