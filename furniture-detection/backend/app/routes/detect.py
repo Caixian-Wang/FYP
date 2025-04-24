@@ -9,20 +9,49 @@ router = APIRouter()
 
 @router.post("/detect/image", response_model=List[DetectionResult])
 async def detect_image(file: UploadFile = File(...)):
+    file_path = None
     try:
+        # 验证文件类型
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="File must be an image")
+        
+        # 保存文件
         file_path = await save_upload_file(file)
+        
+        # 运行检测
         detections = detector.detect(file_path)
+        
         return detections
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Detection failed: {str(e)}")
     finally:
-        cleanup_file(file_path)
+        if file_path:
+            cleanup_file(file_path)
 
 @router.post("/detect/video", response_model=TaskStatus)
 async def detect_video(file: UploadFile = File(...)):
+    file_path = None
     try:
-        video_path = await save_upload_file(file)
-        task = async_video_detection.delay(video_path)
-        return TaskStatus(task_id=task.id, status="PENDING")
+        # 验证文件类型
+        if not file.content_type.startswith('video/'):
+            raise HTTPException(status_code=400, detail="File must be a video")
+        
+        # 保存文件
+        file_path = await save_upload_file(file)
+        
+        # TODO: 实现视频检测
+        # 目前返回一个模拟的任务状态
+        return TaskStatus(
+            task_id="mock_task_id",
+            status="PENDING",
+            progress=0.0
+        )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Video detection failed: {str(e)}")
+    finally:
+        if file_path:
+            cleanup_file(file_path)
