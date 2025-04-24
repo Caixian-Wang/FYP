@@ -127,6 +127,125 @@ const App = () => {
     setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
   };
 
+  const getConfidenceColor = (confidence) => {
+    const percentage = confidence * 100;
+    if (percentage >= 75) return { bg: '#e3f2fd', text: '#1976d2' }; // 蓝色
+    if (percentage >= 50) return { bg: '#e8f5e9', text: '#2e7d32' }; // 绿色
+    if (percentage >= 25) return { bg: '#fff3e0', text: '#f57c00' }; // 黄色
+    return { bg: '#ffebee', text: '#d32f2f' }; // 红色
+  };
+
+  const renderResults = (results) => {
+    if (!results || results.length === 0) {
+      return (
+        <Box
+          sx={{
+            py: 12,
+            px: 6,
+            textAlign: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.02)',
+            borderRadius: 3,
+            border: '1px dashed rgba(0, 0, 0, 0.1)',
+            minHeight: '200px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.03)',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+            }
+          }}
+        >
+          <Typography
+            color="text.secondary"
+            sx={{
+              fontStyle: 'italic',
+              fontSize: '1.2rem',
+              opacity: 0.7
+            }}
+          >
+            {t.noResults}
+          </Typography>
+        </Box>
+      );
+    }
+
+    return (
+      <Stack spacing={2}>
+        {results.map((result, index) => {
+          const confidenceColors = getConfidenceColor(result.confidence);
+          return (
+            <Card
+              key={index}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                border: '1px solid rgba(25, 118, 210, 0.1)',
+                overflow: 'hidden',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
+                }
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg, #1976d2, #2196f3)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 2
+                }}
+              >
+                {t.furnitureType}: {result.class_name}
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  mb: 2
+                }}
+              >
+                <Typography>{t.confidence}:</Typography>
+                <Box
+                  sx={{
+                    px: 2,
+                    py: 0.5,
+                    borderRadius: 2,
+                    backgroundColor: confidenceColors.bg,
+                    color: confidenceColors.text,
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {(result.confidence * 100).toFixed(1)}%
+                </Box>
+              </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                  p: 1,
+                  borderRadius: 1,
+                  fontFamily: 'monospace'
+                }}
+              >
+                {t.coordinates}: [{result.bbox.map(coord => coord.toFixed(1)).join(', ')}]
+              </Typography>
+            </Card>
+          )
+        })}
+      </Stack>
+    );
+  };
+
   const renderPreviewArea = () => {
     if (mediaType === 'video') {
       return (
@@ -270,31 +389,6 @@ const App = () => {
             </Typography>
           </>
         )}
-      </Box>
-    );
-  };
-
-  const renderResults = (results) => {
-    if (!results || results.length === 0) {
-      return <Typography>暂无识别结果</Typography>;
-    }
-
-    return (
-      <Box>
-        <Typography variant="h6" gutterBottom>识别结果</Typography>
-        {results.map((result, index) => (
-          <Card key={index} sx={{ mb: 2, p: 2 }}>
-            <Typography variant="subtitle1" color="primary">
-              家具类型: {result.class_name}
-            </Typography>
-            <Typography>
-              置信度: {(result.confidence * 100).toFixed(1)}%
-            </Typography>
-            <Typography>
-              位置: [{result.bbox.map(coord => coord.toFixed(1)).join(', ')}]
-            </Typography>
-          </Card>
-        ))}
       </Box>
     );
   };
@@ -445,20 +539,6 @@ const App = () => {
                 }
               }}
             >
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{
-                  fontWeight: 'bold',
-                  background: 'linear-gradient(45deg, #1976d2, #2196f3)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 3
-                }}
-              >
-                {t.recognitionResults}
-              </Typography>
               {loading ? (
                 <Box sx={{ width: '100%', mt: 2 }}>
                   <LinearProgress 
@@ -472,41 +552,8 @@ const App = () => {
                     }} 
                   />
                 </Box>
-              ) : results.length > 0 ? (
-                renderResults(results)
               ) : (
-                <Box
-                  sx={{
-                    py: 12,
-                    px: 6,
-                    textAlign: 'center',
-                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                    borderRadius: 3,
-                    border: '1px dashed rgba(0, 0, 0, 0.1)',
-                    minHeight: '200px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      backgroundColor: 'rgba(0, 0, 0, 0.03)',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
-                    }
-                  }}
-                >
-                  <Typography
-                    color="text.secondary"
-                    sx={{
-                      fontStyle: 'italic',
-                      fontSize: '1.2rem',
-                      color: 'text.secondary',
-                      opacity: 0.7
-                    }}
-                  >
-                    {t.noResults}
-                  </Typography>
-                </Box>
+                renderResults(results)
               )}
             </Paper>
           </Box>

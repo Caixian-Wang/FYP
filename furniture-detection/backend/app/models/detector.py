@@ -5,6 +5,9 @@ import cv2
 import numpy as np
 from app.models.base import DetectionResult
 import base64
+import logging
+
+logger = logging.getLogger(__name__)
 
 class FurnitureDetector:
     def __init__(self):
@@ -18,9 +21,9 @@ class FurnitureDetector:
         # 加载模型
         try:
             self.model = YOLO(model_path)
-            print(f"Model loaded successfully from {model_path}")
+            logger.info(f"Model loaded successfully from {model_path}")
         except Exception as e:
-            print(f"Error loading model: {e}")
+            logger.error(f"Error loading model: {e}")
             raise
     
     def draw_detections(self, image: np.ndarray, detections: List[DetectionResult]) -> np.ndarray:
@@ -50,6 +53,8 @@ class FurnitureDetector:
         
     def detect(self, image_path: str) -> Tuple[List[DetectionResult], str]:
         try:
+            logger.info(f"Starting detection on image: {image_path}")
+            
             # 读取原始图像
             original_image = cv2.imread(image_path)
             if original_image is None:
@@ -62,6 +67,8 @@ class FurnitureDetector:
             # 处理检测结果
             for result in results:
                 boxes = result.boxes
+                logger.info(f"Found {len(boxes)} objects")
+                
                 for box in boxes:
                     # 获取类别名称
                     class_id = int(box.cls[0])
@@ -72,6 +79,8 @@ class FurnitureDetector:
                     
                     # 获取边界框坐标
                     bbox = box.xyxy[0].tolist()
+                    
+                    logger.info(f"Detected {class_name} with confidence {confidence:.2f} at {bbox}")
                     
                     # 创建检测结果
                     detections.append(DetectionResult(
@@ -87,10 +96,11 @@ class FurnitureDetector:
             _, buffer = cv2.imencode('.jpg', annotated_image)
             image_base64 = base64.b64encode(buffer).decode('utf-8')
             
+            logger.info(f"Detection completed with {len(detections)} results")
             return detections, f"data:image/jpeg;base64,{image_base64}"
             
         except Exception as e:
-            print(f"Error during detection: {e}")
+            logger.error(f"Error during detection: {e}", exc_info=True)
             raise
 
 # 创建单例实例

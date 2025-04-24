@@ -8,9 +8,9 @@ export const zh = {
   imageFormats: 'JPG, PNG',
   videoFormats: 'MP4',
   captureAndDetect: '捕获并检测',
-  recognitionResults: '识别结果',
+  furnitureType: '家具类型',
   confidence: '置信度',
-  coordinates: '坐标',
-  noResults: '暂无结果',
-  loading: '加载中...'
+  coordinates: '位置',
+  noResults: '暂无识别结果',
+  preview: '预览'
 }; 

@@ -4,6 +4,11 @@ from app.models.base import DetectionResult, TaskStatus
 from app.utils.file_processor import save_upload_file, cleanup_file
 from app.tasks.celery_tasks import async_video_detection
 from app.models.detector import detector
+import logging
+
+# 配置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -15,19 +20,27 @@ async def detect_image(file: UploadFile = File(...)) -> Dict[str, Any]:
         if not file.content_type.startswith('image/'):
             raise HTTPException(status_code=400, detail="File must be an image")
         
+        logger.info(f"Processing file: {file.filename}")
+        
         # 保存文件
         file_path = await save_upload_file(file)
+        logger.info(f"File saved to: {file_path}")
         
         # 运行检测
         detections, annotated_image = detector.detect(file_path)
+        logger.info(f"Detection results: {detections}")
         
-        return {
+        response_data = {
             "detections": detections,
             "annotated_image": annotated_image
         }
+        logger.info("Detection completed successfully")
+        
+        return response_data
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Detection failed: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Detection failed: {str(e)}")
     finally:
         if file_path:
