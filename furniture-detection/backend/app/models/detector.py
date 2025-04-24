@@ -6,7 +6,7 @@ from app.models.base import DetectionResult
 class FurnitureDetector:
     def __init__(self):
         # 更新模型路径
-        model_path = os.path.join('D:/FYP/furniture-detection/weights', 'furniture.pt')
+        model_path = os.path.join('D:/FYP/furniture-detection/weights', 'yolo11n.pt')
         
         # 检查模型文件是否存在
         if not os.path.exists(model_path):
