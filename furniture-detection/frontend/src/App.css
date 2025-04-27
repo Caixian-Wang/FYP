@@ -36,3 +36,69 @@
     transform: rotate(360deg);
   }
 }
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  /* 调整卡片布局 */
+  .MuiCard-root {
+    margin: 8px 0;
+    padding: 12px !important;
+  }
+
+  /* 调整按钮大小 */
+  .MuiButton-root {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  /* 调整图片预览区域 */
+  .preview-container {
+    width: 100% !important;
+    margin: 10px 0;
+  }
+
+  /* 调整结果卡片 */
+  .result-card {
+    padding: 12px !important;
+  }
+
+  /* 调整文字大小 */
+  .MuiTypography-h4 {
+    font-size: 1.5rem !important;
+  }
+
+  .MuiTypography-body1 {
+    font-size: 0.9rem !important;
+  }
+
+  /* 调整间距 */
+  .MuiStack-root {
+    gap: 8px !important;
+  }
+
+  /* 调整工具栏 */
+  .toolbar-container {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  /* 调整上传区域 */
+  .upload-area {
+    padding: 20px !important;
+  }
+}
+
+/* 平板设备 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .App {
+    padding: 15px;
+  }
+
+  .MuiCard-root {
+    margin: 12px 0;
+  }
+}

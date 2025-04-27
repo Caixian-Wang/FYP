@@ -39,6 +39,7 @@ const App = () => {
   const [mode, setMode] = useState('upload'); // 'upload' 或 'camera'
   const [language, setLanguage] = useState('zh');
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const t = language === 'zh' ? zh : en;
 
   const options = ['Option1', 'Option2', 'Option3', 'Option4', 'Option5', 'Option6'];
@@ -49,6 +50,24 @@ const App = () => {
       previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, [mediaType]);
+
+  // 添加设备检测
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // 初始检查
+    checkDevice();
+
+    // 添加窗口大小变化监听
+    window.addEventListener('resize', checkDevice);
+
+    // 清理函数
+    return () => {
+      window.removeEventListener('resize', checkDevice);
+    };
+  }, []);
 
   const handleTypeChange = (_, newType) => {
     if (newType) {
@@ -404,19 +423,19 @@ const App = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        p: 2
+        p: isMobile ? 1 : 2
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth={isMobile ? 'sm' : 'xl'}>
         <Paper
           elevation={8}
           sx={{
-            p: 5,
+            p: isMobile ? 2 : 5,
             borderRadius: 4,
             backgroundColor: 'rgba(255, 255, 255, 0.92)',
             backdropFilter: 'blur(12px)',
-            minHeight: '85vh',
-            maxHeight: '95vh',
+            minHeight: isMobile ? 'auto' : '85vh',
+            maxHeight: isMobile ? 'auto' : '95vh',
             overflowY: 'auto',
             border: '1px solid rgba(255, 255, 255, 0.3)',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -441,7 +460,7 @@ const App = () => {
           </Tooltip>
 
           <Typography
-            variant="h3"
+            variant={isMobile ? 'h4' : 'h3'}
             gutterBottom
             align="center"
             sx={{
@@ -451,20 +470,25 @@ const App = () => {
               textFillColor: 'transparent',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 5,
+              mb: isMobile ? 3 : 5,
               textShadow: '2px 2px 4px rgba(0,0,0,0.08)'
             }}
           >
             {t.title}
           </Typography>
 
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, height: 'calc(85vh - 120px)' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row', 
+            gap: isMobile ? 2 : 4, 
+            height: isMobile ? 'auto' : 'calc(85vh - 120px)' 
+          }}>
             {/* 左侧：上传 & 选项 */}
             <Paper
               elevation={4}
               sx={{
-                width: { xs: '100%', md: '35%' },
-                p: 4,
+                width: isMobile ? '100%' : '35%',
+                p: isMobile ? 2 : 4,
                 borderRadius: 3,
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 border: '1px solid rgba(25, 118, 210, 0.1)',
@@ -475,19 +499,19 @@ const App = () => {
                 }
               }}
             >
-              <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Box sx={{ textAlign: 'center', mb: isMobile ? 2 : 4 }}>
                 <ToggleButtonGroup
                   value={mediaType}
                   exclusive
                   onChange={handleTypeChange}
                   color="primary"
-                  size="large"
+                  size={isMobile ? 'small' : 'large'}
                   sx={{
                     mb: 2,
                     '& .MuiToggleButton-root': {
-                      px: 4,
-                      py: 1.5,
-                      fontSize: '1.1rem',
+                      px: isMobile ? 2 : 4,
+                      py: isMobile ? 0.5 : 1.5,
+                      fontSize: isMobile ? '0.9rem' : '1.1rem',
                       borderRadius: '12px',
                       border: '2px solid #1976d2',
                       '&.Mui-selected': {
@@ -526,11 +550,11 @@ const App = () => {
               elevation={4}
               sx={{
                 flex: 1,
-                p: 4,
+                p: isMobile ? 2 : 4,
                 borderRadius: 3,
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 overflowY: 'auto',
-                maxHeight: '100%',
+                maxHeight: isMobile ? 'auto' : '100%',
                 border: '1px solid rgba(25, 118, 210, 0.1)',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 '&:hover': {
