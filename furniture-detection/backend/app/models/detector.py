@@ -11,16 +11,18 @@ logger = logging.getLogger(__name__)
 
 class FurnitureDetector:
     def __init__(self):
-        # 更新模型路径
-        model_path = os.path.join('D:/FYP/furniture-detection/weights', 'yolo11n.pt')
-        
-        # 检查模型文件是否存在
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"Model file not found at {model_path}")
-        
-        # 加载模型
+        self.weights_dir = os.path.join('D:/FYP/furniture-detection/weights')
+        self.current_model = None
+        self.load_model('yolo11n.pt')  # 默认加载第一个模型
+    
+    def load_model(self, model_name: str):
+        """加载指定的模型"""
         try:
-            self.model = YOLO(model_path)
+            model_path = os.path.join(self.weights_dir, model_name)
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(f"Model file not found at {model_path}")
+            
+            self.current_model = YOLO(model_path)
             logger.info(f"Model loaded successfully from {model_path}")
         except Exception as e:
             logger.error(f"Error loading model: {e}")
@@ -61,7 +63,7 @@ class FurnitureDetector:
                 raise ValueError("Failed to read image")
             
             # 运行检测
-            results = self.model(image_path)
+            results = self.current_model(image_path)
             detections = []
             
             # 处理检测结果

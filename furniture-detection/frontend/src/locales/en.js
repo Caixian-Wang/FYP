@@ -1,16 +1,28 @@
 export const en = {
   title: 'Furniture Detection System',
-  pictureRecognition: 'Picture Recognition',
+  pictureRecognition: 'Image Recognition',
   videoRecognition: 'Video Recognition',
-  uploadImage: 'Click to Upload Image',
-  uploadVideo: 'Click to Upload Video',
+  selectModel: 'Select Model',
+  uploadImage: 'Upload Image',
+  uploadVideo: 'Upload Video',
+  takePhoto: 'Take Photo',
+  startCamera: 'Start Camera',
+  stopCamera: 'Stop Camera',
+  reset: 'Reset',
+  processing: 'Processing...',
+  detectionResults: 'Detection Results',
+  noResults: 'No objects detected',
+  confidence: 'Confidence',
+  error: {
+    uploadFailed: 'Upload failed',
+    cameraError: 'Camera error',
+    detectionFailed: 'Detection failed'
+  },
   supportedFormats: 'Supported Formats',
   imageFormats: 'JPG, PNG',
   videoFormats: 'MP4',
   captureAndDetect: 'Capture and Detect',
   furnitureType: 'Furniture Type',
-  confidence: 'Confidence',
   coordinates: 'Coordinates',
-  noResults: 'No Results Yet',
   preview: 'Preview'
 }; 

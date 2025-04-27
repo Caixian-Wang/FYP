@@ -15,7 +15,11 @@ import {
   Container,
   Paper,
   IconButton,
-  Tooltip
+  Tooltip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -40,6 +44,8 @@ const App = () => {
   const [language, setLanguage] = useState('zh');
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState('');
   const t = language === 'zh' ? zh : en;
 
   const options = ['Option1', 'Option2', 'Option3', 'Option4', 'Option5', 'Option6'];
@@ -69,6 +75,23 @@ const App = () => {
     };
   }, []);
 
+  // 获取可用模型列表
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/models');
+        const data = await response.json();
+        setAvailableModels(data.models);
+        if (data.models.length > 0) {
+          setSelectedModel(data.models[0]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch models:', error);
+      }
+    };
+    fetchModels();
+  }, []);
+
   const handleTypeChange = (_, newType) => {
     if (newType) {
       setMediaType(newType);
@@ -96,6 +119,10 @@ const App = () => {
     }
   };
 
+  const handleModelChange = (event) => {
+    setSelectedModel(event.target.value);
+  };
+
   const handleImageUpload = async (file) => {
     setLoading(true);
     setError(null);
@@ -105,6 +132,7 @@ const App = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('model_name', selectedModel);
 
       const response = await fetch('http://localhost:8000/api/v1/detect/image', {
         method: 'POST',
@@ -543,6 +571,34 @@ const App = () => {
               </Box>
 
               {renderPreviewArea()}
+
+              {/* 模型选择下拉框 - 添加在左下角 */}
+              <Box sx={{ mt: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>{t.selectModel}</InputLabel>
+                  <Select
+                    value={selectedModel}
+                    onChange={handleModelChange}
+                    label={t.selectModel}
+                    sx={{
+                      '& .MuiSelect-select': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        borderRadius: '12px',
+                        border: '2px solid #1976d2',
+                        '&:hover': {
+                          backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                        }
+                      }
+                    }}
+                  >
+                    {availableModels.map((model) => (
+                      <MenuItem key={model} value={model}>
+                        {model}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
             </Paper>
 
             {/* 右侧：识别结果 */}
